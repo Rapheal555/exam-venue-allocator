@@ -15,10 +15,12 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   const [level, setLevel] = useState<string | null>("");
   const [program, setProgram] = useState<string | null>("");
+  const [department, setDepartment] = useState<string | null>("");
   const [name, setName] = useState("");
   const [matric, setMatric] = useState("");
   const [email, setEmail] = useState("");
@@ -31,29 +33,145 @@ export default function Home() {
 
   const addItem = async () => {
     let venue = "";
-    switch (level) {
-      case "ND1":
-        venue = "1000 Capacity";
+    switch (department) {
+      case "Biology":
+        switch (level) {
+          case "HND1":
+            venue = "NLT";
+            break;
+          case "HND2":
+            venue = "Sewage 1";
+            break;
+          default:
+            alert("Biology department does not have ND levels");
+            break;
+        }
         break;
-      case "ND2":
-        venue = "350 Capacity";
+
+      case "Chemistry":
+        switch (level) {
+          case "HND1":
+            venue = "Sewage 2";
+            break;
+          case "HND2":
+            venue = "Chemistry lab 1";
+            break;
+          default:
+            alert("Chemistry department does not have ND levels");
+            break;
+        }
         break;
-      case "ND3":
-        venue = "Computer Lab";
+
+      case "Computer Science":
+        switch (level) {
+          case "ND1":
+            venue = "1000 Capacity";
+            break;
+          case "ND2":
+            venue = "350 Capacity";
+            break;
+          case "ND3":
+            venue = "Computer Lab";
+            break;
+          case "HND1":
+            venue = "NLT";
+            break;
+          case "HND2":
+            venue = "250 Capacity";
+            break;
+          default:
+            venue = "Not Specified";
+            break;
+        }
         break;
-      case "HND1":
-        venue = "NLT";
+
+      case "Geology":
+        switch (level) {
+          case "ND1":
+            venue = "250 Capacity north";
+            break;
+          case "ND2":
+            venue = "GC 2";
+            break;
+          case "ND3":
+            venue = "Sewage 3";
+            break;
+          case "HND1":
+            venue = "NLT";
+            break;
+          case "HND2":
+            venue = "250 Capacity";
+            break;
+          default:
+            venue = "Not Specified";
+            break;
+        }
         break;
-      case "HND2":
-        venue = "250 Capacity";
+
+      case "Mathematics and Statistics":
+        switch (level) {
+          case "ND1":
+            venue = "MT 1";
+            break;
+          case "ND2":
+            venue = "MT 2";
+            break;
+          case "ND3":
+            venue = "NTC 2";
+            break;
+          case "HND1":
+            venue = "NLT";
+            break;
+          case "HND2":
+            venue = "250 Capacity";
+            break;
+          default:
+            venue = "Not Specified";
+            break;
+        }
         break;
+
+      case "Physics":
+        switch (level) {
+          case "HND1":
+            venue = "NLT";
+            break;
+          case "HND2":
+            venue = "250 Capacity";
+            break;
+          default:
+            alert("Physics department does not have ND levels");
+            break;
+        }
+        break;
+
+      case "Science Laboratory Technology":
+        switch (level) {
+          case "ND1":
+            venue = "Sewage 4";
+            break;
+          case "ND2":
+            venue = "NLT";
+            break;
+          case "ND3":
+            venue = "250 Capacity";
+            break;
+
+          default:
+            alert("SLT department does not have HND levels");
+            break;
+        }
+        break;
+
       default:
-        venue = "Not Specified";
+        // alert("Please select a Department");
         break;
     }
+
     if (
       name != "" &&
       email != "" &&
+      department != "" &&
       matric != "" &&
       level != "" &&
       program != "" &&
@@ -63,6 +181,7 @@ export default function Home() {
         const docRef = await addDoc(collection(db, "student"), {
           name: name,
           matric: matric,
+          department: department,
           email: email,
           program: program,
           level: level,
@@ -77,6 +196,7 @@ export default function Home() {
         console.error("Error adding document: ", e);
       }
     } else {
+      setLoading(false);
       alert("Please fill all the feilds");
     }
   };
@@ -142,31 +262,16 @@ export default function Home() {
   };
 
   return (
-    <Container size="lg">
-      <Title
-        order={2}
-        size="h1"
-        style={{ fontFamily: "Greycliff CF, var(--mantine-font-family)" }}
-        fw={900}
-        ta="center"
-      >
-        The Polytechnic Ibadan
-      </Title>
-      <Title
-        order={2}
-        size="h2"
-        mt="xs"
-        style={{ fontFamily: "Greycliff CF, var(--mantine-font-family)" }}
-        ta="center"
-      >
-        Computer Science Department
-      </Title>
-
+    <Container mb="xl" size="lg">
       <Text mt="xl" ta="center">
         Please fill the form below to get your exam venue
       </Text>
 
-      <SimpleGrid cols={{ base: 1, sm: 2 }} mt="xl">
+      <SimpleGrid
+        cols={{ base: 1, sm: 2 }}
+        mt="xl"
+        style={{ alignItems: "baseline" }}
+      >
         <TextInput
           label="Name"
           placeholder="Your name"
@@ -181,23 +286,37 @@ export default function Home() {
           onChange={(e) => setMatric(e.currentTarget.value)}
           variant="filled"
         />
-      </SimpleGrid>
-      <TextInput
-        label="Email Address"
-        placeholder="Your email"
-        mt="md"
-        value={email}
-        onChange={(e) => setEmail(e.currentTarget.value)}
-        variant="filled"
-      />
 
-      <SimpleGrid cols={{ base: 1, sm: 2 }} mt="xl">
+        <Select
+          label="Department"
+          placeholder="Select department"
+          data={[
+            "Biology",
+            "Chemistry",
+            "Computer Science",
+            "Geology",
+            "Library and Information Science",
+            "Mathematics and Statistics",
+            "Physics",
+            "Science Laboratory Technology",
+          ]}
+          value={department}
+          onChange={setDepartment}
+        />
         <Select
           label="Program"
           placeholder="Pick program"
           data={["Full-Time", "DPP", "Part-Time"]}
           value={program}
           onChange={setProgram}
+        />
+        <TextInput
+          label="Email Address"
+          placeholder="Your email"
+          mt="md"
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+          variant="filled"
         />
         <Select
           label="Level"
@@ -212,6 +331,14 @@ export default function Home() {
         <Button onClick={() => fetch()} size="md">
           Submit
         </Button>
+        <Text ta="center" mt="md">
+          Or
+        </Text>
+        <Link href="/all-students" passHref>
+          <Button variant="outline" size="md">
+            View all Students
+          </Button>
+        </Link>
       </Group>
     </Container>
   );

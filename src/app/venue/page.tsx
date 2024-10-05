@@ -15,13 +15,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import { useEffect, useState } from "react";
 import classes from "@/styles/Venue.module.css";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function Page() {
   const [student, setStudent] = useState<any>();
   const params = useSearchParams();
   const id = params.get("id");
+  const router = useRouter();
 
   useEffect(() => {
     if (id != undefined) {
@@ -39,6 +40,13 @@ export default function Page() {
     }
   }, [id]);
 
+  function capitalizeEachWord(str: string) {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
   return (
     <Container size="md">
       {student ? (
@@ -47,11 +55,12 @@ export default function Page() {
             h={140}
             style={{
               backgroundImage:
-                "url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80)",
+                "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjAZeDQFipoDI8eV64NT9oboKnC9SMgC7gJw&s)",
+              backgroundSize: "cover",
             }}
           />
           <Avatar
-            src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-9.png"
+            src={`https://api.dicebear.com/6.x/initials/svg?seed=${student.name}`}
             size={80}
             radius={80}
             mx="auto"
@@ -59,24 +68,41 @@ export default function Page() {
             className={classes.avatar}
           />
           <Text ta="center" fz="lg" fw={500} mt="sm">
-            {student?.name}
+            {capitalizeEachWord(student?.name)}
           </Text>
           <Text ta="center" fz="sm" c="dimmed">
             {student?.matric}
           </Text>
-          <Box>
-            <Text ta="center" fz="lg" fw={500} mt="sm">
-              Exam Venue
-            </Text>
-            <Text
-              ta="center"
-              fw="bold"
-              fz="md"
-              c="var(--mantine-color-green-6)"
-            >
-              {student?.venue}
-            </Text>
-          </Box>
+          <Group mt="md" justify="center" gap={30}>
+            <div>
+              <Text ta="center" fz="lg" fw={500} mt="sm">
+                Department
+              </Text>
+              <Text
+                ta="center"
+                fw="bold"
+                fz="md"
+                c="var(--mantine-color-green-6)"
+              >
+                {student?.department == null
+                  ? "Computer Science"
+                  : student?.department}
+              </Text>
+            </div>
+            <div>
+              <Text ta="center" fz="lg" fw={500} mt="sm">
+                Exam Venue
+              </Text>
+              <Text
+                ta="center"
+                fw="bold"
+                fz="md"
+                c="var(--mantine-color-green-6)"
+              >
+                {student?.venue}
+              </Text>
+            </div>
+          </Group>
           <Group mt="md" justify="center" gap={30}>
             <div>
               <Text ta="center" fz="lg" fw={500}>
@@ -103,14 +129,22 @@ export default function Page() {
               </Text>
             </div>
           </Group>
-          <Link href="/" passHref>
-            <Button fullWidth radius="md" mt="xl" size="md" variant="default">
-              Done
-            </Button>
-          </Link>
+
+          <Button
+            onClick={() => {
+              router.back();
+            }}
+            fullWidth
+            radius="md"
+            mt="xl"
+            size="md"
+            variant="outline"
+          >
+            Done
+          </Button>
         </Card>
       ) : (
-        <LoadingOverlay />
+        <LoadingOverlay visible={true} />
       )}
     </Container>
   );
