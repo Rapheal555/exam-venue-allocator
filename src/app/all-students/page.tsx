@@ -70,7 +70,7 @@ export default function Page() {
   }
 
   return (
-    <Container size="md">
+    <Container size="lg">
       {allStudents ? (
         <Box>
           <Text c="green" fz="xl" fw="bold" my="xl" ta="center" td="underline">
