@@ -331,14 +331,14 @@ export default function Home() {
         <Button onClick={() => fetch()} size="md">
           Submit
         </Button>
-        <Text ta="center" mt="md">
+        {/* <Text ta="center" mt="md">
           Or
         </Text>
         <Link href="/all-students" passHref>
           <Button variant="outline" size="md">
             View all Students
           </Button>
-        </Link>
+        </Link> */}
       </Group>
     </Container>
   );
